@@ -1,4 +1,4 @@
-# TaskFlow — Project Management Web App
+# CodeAlpha_TaskFlow — Project Management Web App
 
 TaskFlow is a student-built project management application inspired by Kanban-style workflows used in tools such as Trello and Asana. It helps users organize projects, track tasks, and collaborate with project members through comments and live updates.
 
@@ -78,10 +78,4 @@ The SQLite database file is created locally by the server. This repository inten
 - Open the same shared project in two browser sessions and verify live updates.
 - Refresh the page and confirm persisted data remains available.
 
-## Security and deployment note
 
-This is a learning and demonstration project, not a production-ready hosted service. Before public deployment, review session configuration, use a strong secret supplied through the environment, enable HTTPS and secure cookies, use persistent session storage, add appropriate rate limits and security headers, and audit access-control behavior. Never upload `taskflow.db`, real passwords, or secret environment values.
-
-## Project status
-
-TaskFlow is being developed as a practical full-stack learning project. Features should only be described as complete after testing them in the current version.
