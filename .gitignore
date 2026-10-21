@@ -1,0 +1,25 @@
+# Installed dependencies
+node_modules/
+
+# Local database and SQLite temporary files
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+
+# Environment variables and local secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Editor-local settings
+.vscode/

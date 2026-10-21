@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f4f7f2">
+  <title>TaskFlow | Project Management</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="/socket.io/socket.io.js" defer></script>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <section id="auth-screen" class="auth-screen">
+    <div class="auth-card">
+      <a class="brand auth-brand" href="#" aria-label="TaskFlow home">
+        <span class="brand-icon">T</span>
+        <span>TaskFlow</span>
+      </a>
+
+      <p class="eyebrow auth-eyebrow">YOUR PERSONAL WORKSPACE</p>
+      <h1 id="auth-title">Welcome back</h1>
+      <p id="auth-description" class="auth-description">
+        Sign in to manage your projects and tasks.
+      </p>
+
+      <form id="login-form" class="auth-form">
+        <div class="auth-field">
+          <label for="login-email">Email address</label>
+          <input id="login-email" name="email" type="email"
+            autocomplete="email" placeholder="you@example.com" required>
+        </div>
+        <div class="auth-field">
+          <label for="login-password">Password</label>
+          <input id="login-password" name="password" type="password"
+            autocomplete="current-password" placeholder="Your password" required>
+        </div>
+        <button class="auth-submit" type="submit">Sign in</button>
+      </form>
+
+      <form id="register-form" class="auth-form" hidden>
+        <div class="auth-field">
+          <label for="register-name">Your name</label>
+          <input id="register-name" name="name" type="text"
+            autocomplete="name" maxlength="60" placeholder="Your name" required>
+        </div>
+        <div class="auth-field">
+          <label for="register-email">Email address</label>
+          <input id="register-email" name="email" type="email"
+            autocomplete="email" placeholder="you@example.com" required>
+        </div>
+        <div class="auth-field">
+          <label for="register-password">Create a password</label>
+          <input id="register-password" name="password" type="password"
+            autocomplete="new-password" minlength="8" maxlength="72"
+            placeholder="At least 8 characters" required>
+        </div>
+        <button class="auth-submit" type="submit">Create account</button>
+      </form>
+
+      <p id="auth-message" class="auth-message" role="status" aria-live="polite"></p>
+
+      <p class="auth-switch">
+        <span id="auth-switch-prompt">New to TaskFlow?</span>
+        <button id="auth-switch-button" class="text-button" type="button">
+          Create an account
+        </button>
+      </p>
+      <p class="auth-note">A simple space to plan, organize, and make progress.</p>
+    </div>
+  </section>
+
+  <div id="app" class="app" hidden>
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="TaskFlow home">
+        <span class="brand-icon">T</span>
+        <span>TaskFlow</span>
+      </a>
+      <span class="tagline">Small steps. Real progress.</span>
+      <div class="user-tools">
+        <span id="realtime-status" class="realtime-status" data-state="offline" aria-live="polite">Live updates offline</span>
+        <span id="logged-in-name" class="logged-in-name"></span>
+        <button id="logout-button" class="secondary-button" type="button">Log out</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <p class="eyebrow">YOUR PERSONAL WORKSPACE</p>
+        <h1>Make room for <span>focused work.</span></h1>
+        <p class="hero-text">
+          Organize projects, manage tasks, and track progress one step at a time.
+        </p>
+      </section>
+
+      <section class="task-panel">
+        <div class="project-toolbar">
+          <div class="project-heading">
+            <p class="eyebrow">PROJECT WORKSPACE</p>
+            <h2 id="current-project-title">My First Project</h2>
+            <p class="panel-subtitle">Choose a project or create a new one.</p>
+          </div>
+
+          <div class="project-controls">
+            <label for="project-select">Current project</label>
+            <select id="project-select"></select>
+            <button id="new-project" type="button" class="secondary-button">
+              + New project
+            </button>
+          </div>
+        </div>
+
+        <section class="members-panel" aria-labelledby="members-title">
+          <div class="members-heading">
+            <div>
+              <p class="eyebrow">TEAM</p>
+              <h3 id="members-title">Project members</h3>
+            </div>
+            <span id="member-count" class="column-count">0</span>
+          </div>
+          <div id="members-list" class="members-list" aria-live="polite"></div>
+          <form id="add-member-form" class="add-member-form" hidden>
+            <div class="member-email-field">
+              <label for="member-email">Add an existing TaskFlow user by email</label>
+              <input id="member-email" name="email" type="email"
+                autocomplete="off" placeholder="teammate@example.com" required>
+            </div>
+            <button id="add-member-button" type="submit">Add member</button>
+          </form>
+          <p id="member-message" class="member-message" role="status" aria-live="polite"></p>
+        </section>
+
+        <div class="task-form">
+          <h3>Add a task</h3>
+          <label for="task-input">What needs to be done?</label>
+          <div class="input-row">
+            <input id="task-input" type="text"
+              placeholder="e.g. Prepare project documentation" maxlength="120">
+            <button id="add-task" type="button">Add task +</button>
+          </div>
+
+          <div class="task-options">
+            <div class="field-group">
+              <label for="task-priority">Priority</label>
+              <select id="task-priority">
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label for="task-due-date">Due date (optional)</label>
+              <input type="date" id="task-due-date">
+            </div>
+          </div>
+        </div>
+
+        <div class="board-toolbar">
+          <input type="search" id="task-search" class="task-search"
+            placeholder="Search tasks in this project..." aria-label="Search tasks">
+          <div class="task-filters" aria-label="Filter tasks">
+            <button type="button" class="filter-button active"
+              data-filter="all" aria-pressed="true">All</button>
+            <button type="button" class="filter-button"
+              data-filter="active" aria-pressed="false">Active</button>
+            <button type="button" class="filter-button"
+              data-filter="completed" aria-pressed="false">Completed</button>
+          </div>
+        </div>
+
+        <div class="board-summary">
+          <span>Project board</span>
+          <span id="task-count">0 tasks</span>
+        </div>
+
+        <div class="kanban-board">
+          <section class="board-column" data-status="todo">
+            <div class="column-heading">
+              <h3><span class="status-dot dot-todo"></span>To Do</h3>
+              <span id="count-todo" class="column-count">0</span>
+            </div>
+            <ul id="list-todo" class="task-list"></ul>
+          </section>
+
+          <section class="board-column" data-status="in-progress">
+            <div class="column-heading">
+              <h3><span class="status-dot dot-progress"></span>In Progress</h3>
+              <span id="count-in-progress" class="column-count">0</span>
+            </div>
+            <ul id="list-in-progress" class="task-list"></ul>
+          </section>
+
+          <section class="board-column" data-status="done">
+            <div class="column-heading">
+              <h3><span class="status-dot dot-done"></span>Done</h3>
+              <span id="count-done" class="column-count">0</span>
+            </div>
+            <ul id="list-done" class="task-list"></ul>
+          </section>
+        </div>
+
+        <section class="activity-panel" aria-labelledby="activity-title">
+          <div class="activity-header">
+            <div>
+              <p class="eyebrow">PROJECT HISTORY</p>
+              <h3 id="activity-title">Recent activity</h3>
+              <p class="panel-subtitle">A record of updates made by your project team.</p>
+            </div>
+            <button id="refresh-activity" class="secondary-button" type="button">Refresh</button>
+          </div>
+          <ul id="activity-list" class="activity-list" aria-live="polite">
+            <li class="activity-empty">Activity will appear here as the project changes.</li>
+          </ul>
+        </section>
+      </section>
+    </main>
+
+    <footer>Built one step at a time · TaskFlow</footer>
+  </div>
+</body>
+</html>
